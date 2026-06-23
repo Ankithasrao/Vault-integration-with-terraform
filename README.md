@@ -314,6 +314,11 @@ terraform apply
 
 <img width="880" height="577" alt="image" src="https://github.com/user-attachments/assets/6041a423-15d4-4768-ada5-50105c587237" />
 
+
+## Note : If you encounter the following error while running ‘terraform apply’ command, then run it again to recreate ‘role-id’ and ‘secret-id’ with the same command as mentioned in step no. 20. After that, paste the new credentials into the code. This will solve your problem.
+
+<img width="835" height="357" alt="image" src="https://github.com/user-attachments/assets/28438292-7c7e-4210-bd60-2230287af4df" />
+
 ## 📊 Use Cases
 
 * AWS Infrastructure Provisioning
