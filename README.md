@@ -248,19 +248,64 @@ This command generates a Secret ID and provides it in the response. Save the Sec
 
 <img width="1156" height="347" alt="terraform vault 5" src="https://github.com/user-attachments/assets/2cf1f3ed-ef41-4d9c-a286-2c063baf0c91" />
 
+#### Now that we are done with Vault, the next step is to write down the Terraform project and check whether Terraform is able to read the secret from Vault.
 
+### 🔐 Terraform Vault Provider Configuration:
+```
+provider "vault" {
+  address = "http://65.1.86.138:8200" // change it according to your address
+  skip_child_token = true
 
+  auth_login {
+    path = "auth/approle/login"
 
+    parameters = {
+      role_id = "fda817b9-8b25-6627-2ed5-fb43fd2b21d9"
+      secret_id = "6f8f44b7-1ba6-7092-40cb-dcd621bfa0ce"
+    }
+  }
+}
+```
 
+### Retrieve Secrets from Vault:
+```
+data "vault_kv_secret_v2" "example" {
+  mount = "kv" // change it according to your mount
+  name  = "test-secret" // change it according to your secret
+}
+```
+### ☁️ AWS resource Configuration:
+```
+resource "aws_instance" "my_instance" {
+  ami           = "ami-0b6d9d3d33ba97d99"
+  instance_type = "t2.micro"
 
+  tags = {
+    Name = "test"
+    Secret = data.vault_kv_secret_v2.example.data["username"]
+  }
+}
+```
+### 🚀 Deploy Infrastructure
 
+Initialize Terraform:
+```
+terraform init
+```
+Validate Configuration:
+```
+terraform validate
+```
+Review Execution Plan:
+```
+terraform plan
+```
+Apply Changes:
+```
+terraform apply
+```
 
-
-
-
-
-
-
+<img width="880" height="577" alt="image" src="https://github.com/user-attachments/assets/6041a423-15d4-4768-ada5-50105c587237" />
 
 ## 📊 Use Cases
 
