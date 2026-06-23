@@ -151,9 +151,102 @@ vault auth enable approle
 
 This command tells Vault to enable the AppRole authentication method.
 
+## **Enable the new secret engine**
+
+There are many option in vault for enabling the secret engines, you can choose according to your requirment, enable the engine and store the secrets in the particular engines.
+
+<img width="1302" height="767" alt="image" src="https://github.com/user-attachments/assets/f013324a-b7e2-4c33-891b-9dbe33dce0c3" />
+
+## Configure Terraform to read the secret from Vault.
+
+Detailed steps to enable and configure AppRole authentication in HashiCorp Vault:
+
+1. **Enable AppRole Authentication**:
+
+To enable the AppRole authentication method in Vault, you need to use the Vault CLI or the Vault HTTP API.
+
+**Using Vault CLI**:
+
+Run the following command to enable the AppRole authentication method:
+
+```bash
+vault auth enable approle
+```
+
+This command tells Vault to enable the AppRole authentication method.
+
+<img width="1357" height="762" alt="image" src="https://github.com/user-attachments/assets/c703fc80-4144-4498-9017-598275aea227" />
+
+2. **Create an AppRole**:
+
+Now you'll need to create an AppRole with appropriate policies and configure its authentication settings.
+
+We need to create policy first,
+
+```
+vault policy write terraform - <<EOF
+path "*" {
+  capabilities = ["list", "read"]
+}
+
+path "secrets/data/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
+
+path "kv/data/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
 
 
+path "secret/data/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
 
+path "auth/token/create" {
+capabilities = ["create", "read", "update", "list"]
+}
+EOF
+```
+<img width="962" height="572" alt="terraform vault 3" src="https://github.com/user-attachments/assets/2db52e27-41a8-4e68-a1c2-5cc56880b30d" />
+
+**a. Create the AppRole**: Here are the steps to create an AppRole
+
+```bash
+vault write auth/approle/role/terraform \
+    secret_id_ttl=10m \
+    token_num_uses=10 \
+    token_ttl=20m \
+    token_max_ttl=30m \
+    secret_id_num_uses=40 \
+    token_policies=terraform
+```
+<img width="982" height="201" alt="terraform vault 4" src="https://github.com/user-attachments/assets/3df37d55-18f4-45bf-8c3a-4d9b0010e9ae" />
+
+3. **Generate Role ID and Secret ID**:
+
+After creating the AppRole, you need to generate a Role ID and Secret ID pair. The Role ID is a static identifier, while the Secret ID is a dynamic credential.
+
+**a. Generate Role ID**:
+
+You can retrieve the Role ID using the Vault CLI:
+
+```bash
+vault read auth/approle/role/my-approle/role-id
+```
+
+Save the Role ID for use in your Terraform configuration.
+
+**b. Generate Secret ID**:
+
+To generate a Secret ID, you can use the following command:
+
+```bash
+vault write -f auth/approle/role/my-approle/secret-id
+   ```
+
+This command generates a Secret ID and provides it in the response. Save the Secret ID securely, as it will be used for Terraform authentication.
+
+<img width="1156" height="347" alt="terraform vault 5" src="https://github.com/user-attachments/assets/2cf1f3ed-ef41-4d9c-a286-2c063baf0c91" />
 
 
 
